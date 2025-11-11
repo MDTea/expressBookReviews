@@ -13,6 +13,8 @@ public_users.post("/register", (req,res) => {
 // Get the book list available in the shop
 public_users.get('/',function (req, res) {
   //Write your code here
+  const book_list = req.params.books;
+  res.send(users[book_list]);
   return res.status(300).json({message: "Yet to be implemented"});
 });
 
