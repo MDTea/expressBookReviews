@@ -8,6 +8,13 @@ let users = [];
 const isValid = (username)=>{ //returns boolean
 //write code to check is the username is valid
     return !(users.some(user => user.username === username));
+    if(users.some(user => user.username === username)){
+        res.json({message: "This username is already taken."});
+        return false;
+    }
+    else{
+        return true;
+    }
 }
 
 const authenticatedUser = (username,password)=>{ //returns boolean
@@ -17,12 +24,17 @@ const authenticatedUser = (username,password)=>{ //returns boolean
 
 //only registered users can login
 regd_users.post("/login", (req,res) => {
-  //Write your code here
-    if(isValid(req.params.username) && authenticatedUser(req.params.username, req.params.password)){
+    const username = req.body.username;
+    const password = req.body.password;
+
+    if(!username || !password){
+        return res.status(400).json({message: "Log in information is missing"});
+    }
+    if(authenticatedUser(username, password)){
         res.json({message: "User successfully logged in!"});
     }
     else{
-        res.status(400).json({message: "User is not recognized or authentication failed."});
+        res.status(401).json({message: "User is not logged in successfully."});
     }
     //return res.status(300).json({message: "Yet to be implemented"});
 });
