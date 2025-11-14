@@ -30,7 +30,23 @@ app.use("/customer/auth/*", function auth(req,res,next){
         return res.status(403).json({ message: "User is not logged in"});
     }
 });
- 
+
+app.post('/customer/login', (req, res) => {
+    const { username, password } = req.body;
+
+    // Validate username and password (your own logic here)
+    if (validUser(username, password)) {
+        const payload = { username: username };
+        const token = jwt.sign(payload, jwtSecret, { expiresIn: '1h' }); // token valid for 1 hour
+
+        // Save token in session
+        req.session.authenticated = { accessToken: token };
+
+        return res.json({ message: "User logged in successfully", token: token });
+    } else {
+        return res.status(401).json({ message: "Invalid credentials" });
+    }
+});
 const PORT =5001;
 
 app.use("/customer", customer_routes);
