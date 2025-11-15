@@ -7,7 +7,6 @@ let users = [];
 
 const isValid = (username)=>{ //returns boolean
 //write code to check is the username is valid
-    return !(users.some(user => user.username === username));
     if(users.some(user => user.username === username)){
         res.json({message: "This username is already taken."});
         return false;
@@ -15,6 +14,7 @@ const isValid = (username)=>{ //returns boolean
     else{
         return true;
     }
+    // return !(users.some(user => user.username === username));
 }
 
 const authenticatedUser = (username,password)=>{ //returns boolean
@@ -31,12 +31,11 @@ regd_users.post("/login", (req,res) => {
         return res.status(400).json({message: "Log in information is missing"});
     }
     if(authenticatedUser(username, password)){
-        res.json({message: "User successfully logged in!"});
+        return res.json({message: "User successfully logged in!"});
     }
     else{
-        res.status(401).json({message: "User is not logged in successfully."});
+        return res.status(401).json({message: "User is not logged in successfully."});
     }
-    //return res.status(300).json({message: "Yet to be implemented"});
 });
 
 // Add a book review
