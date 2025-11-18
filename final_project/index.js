@@ -1,6 +1,7 @@
 const express = require('express');
 const jwt = require('jsonwebtoken');
 const session = require('express-session')
+const {isValid} = require('./router/auth_users.js');
 const customer_routes = require('./router/auth_users.js').authenticated;
 const genl_routes = require('./router/general.js').general;
 
@@ -35,11 +36,14 @@ app.post('/customer/login', (req, res) => {
     const { username, password } = req.body;
 
     // Validate username and password (your own logic here)
-    if (validUser(username, password)) {
-        const payload = { username: username };
-        const token = jwt.sign(payload, jwtSecret, { expiresIn: '1h' }); // token valid for 1 hour
+    if (!username || !password) {
+        return res.status(400).json({ message: "Username or password missing" });
+    }
 
-        // Save token in session
+    if (isValid(username, password)) {
+        const payload = { username: username };
+        const token = jwt.sign(payload, jwtSecret, { expiresIn: '1h' });
+
         req.session.authenticated = { accessToken: token };
 
         return res.json({ message: "User logged in successfully", token: token });
