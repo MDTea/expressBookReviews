@@ -1,12 +1,11 @@
 const express = require('express');
 let books = require("./booksdb.js");
-let {existingAccount} = require("./auth_users.js");
+let {isExistingAccount} = require("./auth_users.js");
 let users = require("./auth_users.js").users;
 const public_users = express.Router();
 
 
 public_users.post("/register", (req,res) => {
-  //Write your code here
   return res.status(300).json({message: "Yet to be implemented"});
 });
 

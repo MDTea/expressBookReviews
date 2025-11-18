@@ -1,7 +1,7 @@
 const express = require('express');
 const jwt = require('jsonwebtoken');
 const session = require('express-session')
-const {isValid} = require('./router/auth_users.js');
+const {isNewAccount, isExistingAccount} = require('./router/auth_users.js');
 const customer_routes = require('./router/auth_users.js').authenticated;
 const genl_routes = require('./router/general.js').general;
 
@@ -32,6 +32,26 @@ app.use("/customer/auth/*", function auth(req,res,next){
     }
 });
 
+app.post('/customer/register', (req, res) => {
+    const { username, password } = req.body;
+
+    // Validate username and password (your own logic here)
+    if (!username || !password) {
+        return res.status(400).json({ message: "Username or password missing" });
+    }
+    if(!isNewAccount(username)){
+        return res.status(409).json({ message: "Username or password already exists"});
+    }
+
+    // Here you would normally hash the password and save the user to DB
+    // saveUser(username, hashedPassword);
+
+    const payload = { username: username };
+    const token = jwt.sign(payload, jwtSecret, { expiresIn: '1h' });
+    req.session.authenticated = { accessToken: token };
+    return res.json({ message: "User registered successfully", token: token });
+});
+
 app.post('/customer/login', (req, res) => {
     const { username, password } = req.body;
 
@@ -40,17 +60,16 @@ app.post('/customer/login', (req, res) => {
         return res.status(400).json({ message: "Username or password missing" });
     }
 
-    if (isValid(username, password)) {
+    if (isExistingAccount(username, password)) {
         const payload = { username: username };
         const token = jwt.sign(payload, jwtSecret, { expiresIn: '1h' });
-
         req.session.authenticated = { accessToken: token };
-
         return res.json({ message: "User logged in successfully", token: token });
     } else {
         return res.status(401).json({ message: "Invalid credentials" });
     }
 });
+
 const PORT =5001;
 
 app.use("/customer", customer_routes);

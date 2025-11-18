@@ -8,15 +8,8 @@ let users = [
     {username: "user2", password: "pass2"}
 ];
 
-const existingAccount = (username, password)=>{ //returns boolean
-//write code to check is the username is valid
-    if((users.some(user => user.username === username)) && (users.some(user=> user.password === password))){
-        return true;
-    }
-    else{
-        return false;
-    }
-    // return !(users.some(user => user.username === username));
+const isExistingAccount = (username, password)=>{ //returns boolean
+    return ((users.some(user => user.username === username)) && (users.some(user=> user.password === password)));
 }
 
 const authenticatedUser = (username,password)=>{ //returns boolean
@@ -47,5 +40,6 @@ regd_users.put("/auth/review/:isbn", (req, res) => {
 });
 
 module.exports.authenticated = regd_users;
-module.exports.existingAccount = existingAccount;
+module.exports.isNewAccount = isNewAccount;
+module.exports.isExistingAccount = isExistingAccount;
 module.exports.users = users;
