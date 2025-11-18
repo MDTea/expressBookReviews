@@ -8,7 +8,7 @@ let users = [
     {username: "user2", password: "pass2"}
 ];
 
-const isValid = (username, password)=>{ //returns boolean
+const existingAccount = (username, password)=>{ //returns boolean
 //write code to check is the username is valid
     if((users.some(user => user.username === username)) && (users.some(user=> user.password === password))){
         return true;
@@ -47,5 +47,5 @@ regd_users.put("/auth/review/:isbn", (req, res) => {
 });
 
 module.exports.authenticated = regd_users;
-module.exports.isValid = isValid;
+module.exports.existingAccount = existingAccount;
 module.exports.users = users;
