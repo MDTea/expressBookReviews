@@ -1,7 +1,7 @@
 const express = require('express');
 const jwt = require('jsonwebtoken');
 const session = require('express-session')
-const {isNewAccount, isExistingAccount} = require('./router/auth_users.js');
+const {isExistingAccount, users} = require('./router/auth_users.js');
 const customer_routes = require('./router/auth_users.js').authenticated;
 const genl_routes = require('./router/general.js').general;
 
@@ -39,13 +39,13 @@ app.post('/customer/register', (req, res) => {
     if (!username || !password) {
         return res.status(400).json({ message: "Username or password missing" });
     }
-    if(!isNewAccount(username)){
+    if(isExistingAccount(username)){
         return res.status(409).json({ message: "Username or password already exists"});
     }
 
     // Here you would normally hash the password and save the user to DB
     // saveUser(username, hashedPassword);
-
+    
     const payload = { username: username };
     const token = jwt.sign(payload, jwtSecret, { expiresIn: '1h' });
     req.session.authenticated = { accessToken: token };

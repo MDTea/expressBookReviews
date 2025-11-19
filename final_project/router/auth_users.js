@@ -17,6 +17,37 @@ const authenticatedUser = (username,password)=>{ //returns boolean
     return users.some(user => user.username === username && user.password === password);
 }
 
+const saveUser = (username, password) => {
+    let message = "";
+    try{
+        users.push({"username": username, "password": password});
+        message = "User successfully saved";
+    }catch(err){
+        message = "User failed to save : ";;
+        return (message + err);
+    }
+}
+
+// register
+regd_users.post("/register", (req,res) => {
+    const username = req.body.username;
+    const password = req.body.password;
+
+    if(!username || !password){
+        return res.status(400).json({message: "Log in information is missing"});
+    }
+    if(isExistingAccount(username, password)){
+        return res.json({message: "This user already exists."});
+    }
+    else if(!isExistingAccount(username, password)){
+        const resultMsg = saveUser(username, password);
+        return res.json({message: resultMsg});
+    }
+    else{
+        return res.status(401).json({message: "User is not logged in successfully."});
+    }
+});
+
 //only registered users can login
 regd_users.post("/login", (req,res) => {
     const username = req.body.username;
@@ -40,6 +71,5 @@ regd_users.put("/auth/review/:isbn", (req, res) => {
 });
 
 module.exports.authenticated = regd_users;
-module.exports.isNewAccount = isNewAccount;
 module.exports.isExistingAccount = isExistingAccount;
 module.exports.users = users;
