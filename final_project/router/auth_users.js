@@ -66,7 +66,9 @@ regd_users.post("/login", (req,res) => {
 
 // Add a book review
 regd_users.put("/auth/review/:isbn", (req, res) => {
-  //Write your code here
+  //You have to give a review as a request query & it must get posted with the username (stored in the session) posted. 
+  //If the same user posts a different review on the same ISBN, it should modify the existing review. 
+  //If another user logs in and posts a review on the same ISBN, it will get added as a different review under the same ISBN.
   return res.status(300).json({message: "Yet to be implemented"});
 });
 
