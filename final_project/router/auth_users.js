@@ -8,6 +8,10 @@ let users = [
     {username: "user2", password: "pass2"}
 ];
 
+// let reviews = [
+//     {username: "user1", review: "This book is a five out of five stars!"},
+// ];
+
 const isExistingAccount = (username, password)=>{ //returns boolean
     return ((users.some(user => user.username === username)) && (users.some(user=> user.password === password)));
 }
@@ -66,10 +70,22 @@ regd_users.post("/login", (req,res) => {
 
 // Add a book review
 regd_users.put("/auth/review/:isbn", (req, res) => {
-  //You have to give a review as a request query & it must get posted with the username (stored in the session) posted. 
-  //If the same user posts a different review on the same ISBN, it should modify the existing review. 
-  //If another user logs in and posts a review on the same ISBN, it will get added as a different review under the same ISBN.
-  return res.status(300).json({message: "Yet to be implemented"});
+    //You have to give a review as a request query & it must get posted with the username (stored in the session) posted. 
+    //If the same user posts a different review on the same ISBN, it should modify the existing review. 
+    //If another user logs in and posts a review on the same ISBN, it will get added as a different review under the same ISBN.
+    // Verify the web token first
+    let token = req.session.authenticated['accessToken'];
+    jwt.verify(token, "access", (err, user) => {
+        if(!err){
+            req.user = user;
+            next(); // Proceed to next middleware
+        }
+        else{
+            return res.status(403).json({ message: "User not authenticated"});
+        }
+    });
+
+    return res.status(300).json({message: "Yet to be implemented"});
 });
 
 module.exports.authenticated = regd_users;
