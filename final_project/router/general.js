@@ -9,17 +9,40 @@ public_users.post("/register", (req,res) => {
   return res.status(300).json({message: "Yet to be implemented"});
 });
 
+// --- TASK 10 --- PROMISE
 // Get the book list available in the shop
 public_users.get('/',function (req, res) {
-  res.json(books);
+    retrieveBookList()
+    .then(books => res.json(books))
+    .catch(err => res.status(500).json({error: err.message}));
 });
 
+function retrieveBookList(){
+    return new Promise((resolve, reject) =>  {
+        resolve(books);
+    })
+}
+
+// --- TASK 11 --- ASYNC-AWAIT
 // Get book details based on ISBN
-public_users.get('/isbn/:isbn',function (req, res) {
-  const isbn = req.params.isbn;
-  res.send(books[isbn]);
+public_users.get('/isbn/:isbn', async (req, res)=> {
+    try{
+        const bookDetails = getBookDetails(req.params.isbn);
+        if(!bookDetails){
+            return res.status(404).json({error: "This book does not have any details."});
+        }
+        res.json(bookDetails);
+    }
+    catch(err){
+        res.status(500).json({error: err.message});
+    }
  });
   
+async function getBookDetails(isbn){
+    return books[isbn];
+}
+
+// --- TASK 12 --- PROMISE
 // Get book details based on author
 public_users.get('/author/:author', function (req, res) {
     const author = req.params.author.toLowerCase();
