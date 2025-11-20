@@ -45,23 +45,41 @@ async function getBookDetails(isbn){
 // --- TASK 12 --- PROMISE
 // Get book details based on author
 public_users.get('/author/:author', function (req, res) {
-    const author = req.params.author.toLowerCase();
-    const booksByAuthor = [];
-  
-    Object.keys(books).forEach((key) => {
-      console.log(`Checking author: ${books[key].author}`); // debug
-      if (books[key].author.toLowerCase() === author) {
-        booksByAuthor.push(books[key]);
-      }
-    });
-  
-    if (booksByAuthor.length > 0) {
-      res.json(booksByAuthor);
-    } else {
-      res.status(404).json({ message: "No books found by this author" });
-    }
+    getBooksByAuthor(req.params.author)
+        .then(booksByAuthor => { // whatever is returned by getBooksByAuthor is put as the param here, which is booksByAuthor;         // Note that .then is a callback that happens AFTER the promise resolves
+
+            if(booksByAuthor.length > 0){
+                res.json(booksByAuthor);
+            }
+            else{
+                res.status(404).json({message: "No books are found under this author"});
+            }
+        })
+        .catch(err => {
+            res.status(500).json({error: err.message});
+        })
 });
 
+function getBooksByAuthor(author){
+    return new Promise((resolve, reject) => { // Promise executor callback, runs immediately
+        try{
+            const thisAuthor = author.toLowerCase();
+            const booksByAuthor = [];
+            //iterate through books list
+            Object.keys(books).forEach((key) => {
+                console.log(`Checking author: ${books[key].author}`); // debug
+                if (books[key].author.toLowerCase() === author) {
+                  booksByAuthor.push(books[key]);
+                }
+            });
+
+            resolve(booksByAuthor);
+        }
+        catch(err){
+            reject(err);
+        }
+    })
+}
 // Get all books based on title
 public_users.get('/title/:title',function (req, res) {
     const title = req.params.title.toLowerCase();
