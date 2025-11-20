@@ -107,6 +107,27 @@ regd_users.put("/auth/review/:isbn", (req, res) => {
     });
 });
 
+regd_users.delete("/auth/review/:isbn", (req, res) => {
+    // Find the review based on the session username
+    const thisUser = req.user.username;
+    const thisIsbn = req.params.isbn;
+    const thisBook = books[thisIsbn];
+    const thisReview = thisBook.reviews[thisUser];
+
+    // Checking if we have valid data
+    if(!thisBook){ return res.status(404).json({message: "This book doesn't exist :("}); }
+    if(!thisReview) { return res.status(404).json({message: "This review does not exist in our database."});}
+    
+    // delete review
+    delete thisBook.reviews[thisUser];
+
+    // success statement
+    return res.status(200).json({
+        message: "Your review has been deleted.", 
+        reviews: thisBook.reviews
+    });
+});
+
 module.exports.authenticated = regd_users;
 module.exports.isExistingAccount = isExistingAccount;
 module.exports.users = users;
