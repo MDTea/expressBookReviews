@@ -73,7 +73,7 @@ regd_users.put("/auth/review/:isbn", (req, res) => {
 
     // Verify the web token 
     let token = req.session.authenticated['accessToken'];
-    jwt.verify(token, "access", (err, user) => {
+    jwt.verify(token, "superSecr3t32939", (err, user) => {
         if(err){
             return res.status(403).json({ message: "User not authenticated", token:token});
         }
@@ -82,15 +82,15 @@ regd_users.put("/auth/review/:isbn", (req, res) => {
 
         // Set up the consts
         const thisUser = req.user.username;
-        const thisIsbn = req.body.isbn;
+        const thisIsbn = req.params.isbn;
         const thisReview = req.body.review;
         
         // validate the input
-        if(!thisIsbn || !thisReview){
+        if(!thisReview){
             return res.status(400).json({message : "There are fields of information missing. Please review and retry request"});
         }
 
-        const thisBook = books[isbn]; // because isbn = index
+        const thisBook = books[thisIsbn]; // because isbn = index
         if(!thisBook){
             return res.status(404).json({message: "The book that you're reviewing about does not exist in our database"});
         }

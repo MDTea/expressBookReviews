@@ -11,7 +11,12 @@ const jwtSecret = "superSecr3t32939";
 
 app.use(express.json());
 
-app.use("/customer",session({secret:"fingerprint_customer",resave: true, saveUninitialized: true}))
+app.use("/customer",session({
+    secret:"fingerprint_customer",
+    resave: false, 
+    saveUninitialized: false,
+    cookie: {secure: false }
+}))
 
 app.use("/customer/auth/*", function auth(req,res,next){
     //Write the authenication mechanism here
@@ -19,13 +24,17 @@ app.use("/customer/auth/*", function auth(req,res,next){
     if(req.session && req.session.authenticated && req.session.authenticated.accessToken){
         let token = req.session.authenticated['accessToken'];
         // verify JWT
-        jwt.verify(token, "access", (err, user) => {
-            if(!err){
-                req.user = user;
-                next(); // Proceed to next middleware
+        jwt.verify(token, jwtSecret, (err, user) => {
+            if(err){
+                return res.status(403).json({ 
+                    message: "User not authenticated", 
+                    error: err, 
+                    session: req.session
+                });
             }
             else{
-                return res.status(403).json({ message: "User not authenticated"});
+                req.user = user;
+                next(); // Proceed to next middleware
             }
         });
     }
@@ -44,13 +53,17 @@ app.post('/customer/register', (req, res) => {
     if(isExistingAccount(username, password)){
         return res.status(409).json({ message: "Username or password already exists"});
     }
-    else{
-        const payload = { username: username };
-        const token = jwt.sign(payload, jwtSecret, { expiresIn: '1h' });
-        req.session.authenticated = { accessToken: token };
-        users.push({"username": username, "password": password});
-        return res.json({ message: "User registered successfully", token: token , users: users});
-    }    
+
+    const payload = { username: username };
+    const token = jwt.sign(payload, jwtSecret, { expiresIn: '1h' });
+    req.session.authenticated = { accessToken: token };
+    users.push({"username": username, "password": password});
+    return res.json({ 
+        message: "User registered successfully", 
+        token: token , 
+        users: users
+    });
+        
 });
 
 app.post('/customer/login', (req, res) => {
@@ -62,7 +75,7 @@ app.post('/customer/login', (req, res) => {
     }
 
     if (isExistingAccount(username, password)) {
-        const payload = { username: username };
+        const payload = { username };
         const token = jwt.sign(payload, jwtSecret, { expiresIn: '1h' });
         req.session.authenticated = { accessToken: token };
         return res.json({ message: "User logged in successfully", token: token });
