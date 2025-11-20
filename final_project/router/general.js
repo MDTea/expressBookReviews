@@ -80,9 +80,26 @@ function getBooksByAuthor(author){
         }
     })
 }
-// Get all books based on title
+
+// --- TASK 13 --- Get all books based on title
 public_users.get('/title/:title',function (req, res) {
-    const title = req.params.title.toLowerCase();
+    try{
+        const title = req.params.title();
+        const booksByTitle = getBooksByTitle(title);
+
+        if (booksByTitle.length > 0) {
+            res.json(booksByTitle);
+        } else {
+            res.status(404).json({ message: "No books found with this title" });
+        }
+    }
+    catch(err){
+        res.status(400).json({error: err.message});
+    }
+});
+
+async function getBooksByTitle(titleParam){
+    const title = titleParam.toLowerCase();
     const booksByTitle = [];
 
     Object.keys(books).forEach((value) => {
@@ -91,14 +108,8 @@ public_users.get('/title/:title',function (req, res) {
         booksByTitle.push(books[value]);
         }
     });
-
-    if (booksByTitle.length > 0) {
-        res.json(booksByTitle);
-    } else {
-        res.status(404).json({ message: "No books found with this title" });
-    }
-  return res.status(300).json({message: "Yet to be implemented"});
-});
+    return booksByTitle;    
+}
 
 //  Get book review
 public_users.get('/review/:isbn',function (req, res) {
