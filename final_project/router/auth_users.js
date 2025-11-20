@@ -75,7 +75,7 @@ regd_users.put("/auth/review/:isbn", (req, res) => {
     let token = req.session.authenticated['accessToken'];
     jwt.verify(token, "access", (err, user) => {
         if(err){
-            return res.status(403).json({ message: "User not authenticated"});
+            return res.status(403).json({ message: "User not authenticated", token:token});
         }
 
         req.user = user;

@@ -8,6 +8,7 @@ const genl_routes = require('./router/general.js').general;
 
 const app = express();
 const jwtSecret = "superSecr3t32939";
+
 app.use(express.json());
 
 app.use("/customer",session({secret:"fingerprint_customer",resave: true, saveUninitialized: true}))
@@ -40,17 +41,16 @@ app.post('/customer/register', (req, res) => {
     if (!username || !password) {
         return res.status(400).json({ message: "Username or password missing" });
     }
-    if(isExistingAccount(username)){
+    if(isExistingAccount(username, password)){
         return res.status(409).json({ message: "Username or password already exists"});
     }
-
-    // Here you would normally hash the password and save the user to DB
-    // saveUser(username, hashedPassword);
-    
-    const payload = { username: username };
-    const token = jwt.sign(payload, jwtSecret, { expiresIn: '1h' });
-    req.session.authenticated = { accessToken: token };
-    return res.json({ message: "User registered successfully", token: token });
+    else{
+        const payload = { username: username };
+        const token = jwt.sign(payload, jwtSecret, { expiresIn: '1h' });
+        req.session.authenticated = { accessToken: token };
+        users.push({"username": username, "password": password});
+        return res.json({ message: "User registered successfully", token: token , users: users});
+    }    
 });
 
 app.post('/customer/login', (req, res) => {
